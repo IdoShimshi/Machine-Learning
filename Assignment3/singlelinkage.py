@@ -26,7 +26,23 @@ def singlelinkage(X, k):
         cluster_distances[argmin[0]] = np.full((m),np.inf)
         
 
+
     return np.array(clusters).reshape(-1,1)
+
+def replace_large_numbers(arr):
+    # Create a dictionary to store the mapping of large numbers to small numbers
+    mapping = {}
+    # Iterate through the array
+    for i in range(len(arr)):
+        # If the current number is not already in the mapping
+        if arr[i] not in mapping:
+            # Assign it the next available number
+            mapping[arr[i]] = len(mapping)
+    # Iterate through the array
+    for i in range(len(arr)):
+        # Replace each element with its corresponding small number
+        arr[i] = mapping[arr[i]]
+    return arr
 
 
 def simple_test():
@@ -35,7 +51,7 @@ def simple_test():
     # X = np.concatenate((data['train0'], data['train1']))
     data_i = data[f'train0']
     np.random.shuffle(data_i)
-    X = data_i[:3]
+    X = data_i[:30]
     for i in range(1,10):
         data_i = data[f'train{i}']
         np.random.shuffle(data_i)
