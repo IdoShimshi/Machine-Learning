@@ -12,21 +12,20 @@ def singlelinkage(X, k):
     m = X.shape[0]
     cluster_distances = distance_matrix(X,X,2)
     np.fill_diagonal(cluster_distances, np.inf)
-    clusters = range(m)
-    for i in range(m-k):
+    clusters = np.arange(m)
+    for j in range(m-k):
         argmin = np.unravel_index(cluster_distances.argmin(), cluster_distances.shape)
         for i in range(len(clusters)):
             if clusters[i] == argmin[0]:
-                clusters[i] == argmin[1]
-
+                clusters[i] = argmin[1]
         new_distances = [min(cluster_distances[i,argmin[0]],cluster_distances[i,argmin[1]]) if cluster_distances[i,argmin[1]] != np.inf else np.inf for i in range(m)]
         cluster_distances[:,argmin[1]] = new_distances
         cluster_distances[argmin[1]] = new_distances
         cluster_distances[:,argmin[0]] = np.full((m),np.inf)
         cluster_distances[argmin[0]] = np.full((m),np.inf)
-        
 
 
+    replace_large_numbers(clusters)
     return np.array(clusters).reshape(-1,1)
 
 def replace_large_numbers(arr):
@@ -60,6 +59,7 @@ def simple_test():
 
     # run single-linkage
     c = singlelinkage(X, k=10)
+    print(c)
 
     assert isinstance(c, np.ndarray), "The output of the function softsvm should be a numpy array"
     assert c.shape[0] == m and c.shape[1] == 1, f"The shape of the output should be ({m}, 1)"

@@ -25,15 +25,8 @@ def gensmallm(x_list: list, y_list: list, m: int):
 
     return rearranged_x[:m], rearranged_y[:m]
 
-def get_graph_data(sample_size, k):
-    data = np.load('mnist_all.npz')
-    data_x, data_y = [],[]
-    for i in range(10):
-        data_x.append(data[f'train{i}'])
-        data_y.append(i)
-    X,Y = gensmallm(data_x, data_y, sample_size)
-
-    clustering = kmeans(X,k,t=10)
+def get_table(X,Y,k,alg):
+    clustering = alg(X,k)
     table = [["Cluster Size", "common label", "% of common label"]]
     cluster_labels = {}
     for i in range(k):
@@ -53,7 +46,7 @@ def get_graph_data(sample_size, k):
         cluster_labels[i] = max_label
         
         table.append([len(indexes), int(max_label), f"{round((max_label_count/len(indexes))*100,2)}%"])
-    
+
     classification = np.copy(clustering).reshape(1,-1)[0]
     for i in range(len(classification)):
         classification[i] = cluster_labels[classification[i]]
@@ -62,7 +55,19 @@ def get_graph_data(sample_size, k):
     for i in range(Y.shape[0]):
         if Y[i] != classification[i]:
             wrong_label_count += 1
-    print(f"The classification error for kmeans with k={k} and a random sample of size {sample_size} was:{wrong_label_count/Y.shape[0]}")
+
+    return table, wrong_label_count
+
+def get_graph_data(sample_size, k):
+    data = np.load('mnist_all.npz')
+    data_x, data_y = [],[]
+    for i in range(10):
+        data_x.append(data[f'train{i}'])
+        data_y.append(i)
+    X,Y = gensmallm(data_x, data_y, sample_size)
+
+    table, error = get_table(X,Y,k,kmeans)
+    print(f"The classification error for kmeans with k={k} and a random sample of size {sample_size} was:{error/Y.shape[0]}")
     return table
 
 

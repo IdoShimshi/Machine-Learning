@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def kmeans(X, k, t):
+def kmeans(X, k, t=100):
     """
     :param X: numpy array of size (m, d) containing the test samples
     :param k: the number of clusters
@@ -17,7 +17,7 @@ def kmeans(X, k, t):
             return np.array(clusters_old).reshape(-1,1) 
         clusters_old = clusters_new
         clusters_new = split_to_cluster(X,centers)
-        centers = calc_centroids(clusters_new,X,k)  
+        centers = calc_centroids(clusters_new,X,k, centers)  
     return np.array(clusters_new).reshape(-1,1) 
 
 
@@ -30,10 +30,14 @@ def split_to_cluster(X,centers):
         clusters.append(np.argmin(distances))
     return np.array(clusters)
 
-def calc_centroids(clusters,X,k):
+def calc_centroids(clusters,X,k, old_centers):
     centroids = []
     for i in range(k):
-        centroids.append(np.mean(X[clusters == i],axis=0))
+        cluster = X[clusters == i]
+        if len(cluster) == 0:
+            centroids.append(old_centers[i])
+        else:
+            centroids.append(np.mean(cluster,axis=0))
     return np.array(centroids)
 
 def simple_test():
